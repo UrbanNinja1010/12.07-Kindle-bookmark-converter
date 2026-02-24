@@ -1,0 +1,23 @@
+{
+	"schemaVersion": "0.1.0",
+	"name": "Bookmarks/highlights",
+	"behavior": "create",
+	"noteContentFormat": "{{content}}",
+	"properties": [
+		{
+			"name": "tags",
+			"value": "quotes",
+			"type": "multitext"
+		},
+		{
+			"name": "author",
+			"value": "{{author|split:\\\", \\\"|wikilink|join}}",
+			"type": "multitext"
+		}
+	],
+	"triggers": [
+		"https://urbanninja1010.github.io/12.07-Kindle-bookmark-converter/"
+	],
+	"noteNameFormat": "{{title}} - {{author}}",
+	"path": ""
+}
