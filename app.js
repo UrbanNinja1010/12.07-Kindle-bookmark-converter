@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (files.length) handleFile(files[0]);
     });
 
-    fileInput.addEventListener('change', function() {
+    fileInput.addEventListener('change', function () {
         if (this.files.length) handleFile(this.files[0]);
     });
 
@@ -56,15 +56,28 @@ document.addEventListener('DOMContentLoaded', () => {
     function processKindleHTML(htmlString) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlString, 'text/html');
-        
+
         currentTitle = doc.querySelector('.bookTitle')?.textContent.trim() || 'Unknown Title';
-        currentAuthors = doc.querySelector('.authors')?.textContent.trim() || 'Unknown Author';
-        
+        let rawAuthors = doc.querySelector('.authors')?.textContent.trim() || 'Unknown Author';
+
+        // Ensure authors are comma-separated (Kindle sometimes separates multiple authors with semicolons)
+        currentAuthors = rawAuthors.split(';').map(a => a.trim()).filter(a => a).join(', ');
+
+        // Update page metadata for Obsidian Webclipper
+        document.title = currentTitle;
+        let authorMeta = document.querySelector('meta[name="author"]');
+        if (!authorMeta) {
+            authorMeta = document.createElement('meta');
+            authorMeta.name = 'author';
+            document.head.appendChild(authorMeta);
+        }
+        authorMeta.content = currentAuthors;
+
         const elements = doc.querySelectorAll('.sectionHeading, .noteHeading, .noteText');
         currentItems = [];
         let currentSection = '';
         let currentNoteHeading = '';
-        
+
         elements.forEach(el => {
             if (el.classList.contains('sectionHeading')) {
                 currentSection = el.textContent.trim();
@@ -73,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (el.classList.contains('noteText')) {
                 const headingLower = currentNoteHeading.toLowerCase();
                 const isNote = headingLower.includes('note -');
-                
+
                 // Extract location/page info
                 let metadata = currentNoteHeading;
                 if (metadata.includes('-')) {
@@ -88,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         });
-        
+
         renderOutput(currentTitle, currentAuthors, currentItems);
     }
 
@@ -123,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         html += `</article>`;
-        
+
         obsidianView.innerHTML = html;
         uploadSection.classList.add('hidden');
         outputSection.classList.remove('hidden');
