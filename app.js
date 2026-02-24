@@ -93,12 +93,44 @@ document.addEventListener('DOMContentLoaded', () => {
                     metadata = metadata.split('-').slice(1).join('-').trim();
                 }
 
-                currentItems.push({
-                    section: currentSection,
-                    metadata: metadata,
-                    text: el.textContent.trim(),
-                    type: isNote ? 'note' : 'highlight'
-                });
+                if (isNote) {
+                    const lastItem = currentItems[currentItems.length - 1];
+                    let isLinked = false;
+
+                    if (lastItem && lastItem.type === 'highlight') {
+                        if (lastItem.metadata === metadata) {
+                            isLinked = true;
+                        } else {
+                            const lastLocMatch = lastItem.metadata.match(/Location\s+(\d+)/i);
+                            const currentLocMatch = metadata.match(/Location\s+(\d+)/i);
+                            if (lastLocMatch && currentLocMatch) {
+                                const lastLoc = parseInt(lastLocMatch[1], 10);
+                                const currentLoc = parseInt(currentLocMatch[1], 10);
+                                if (Math.abs(currentLoc - lastLoc) <= 20) {
+                                    isLinked = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if (isLinked) {
+                        lastItem.note = el.textContent.trim();
+                    } else {
+                        currentItems.push({
+                            section: currentSection,
+                            metadata: metadata,
+                            text: el.textContent.trim(),
+                            type: 'note'
+                        });
+                    }
+                } else {
+                    currentItems.push({
+                        section: currentSection,
+                        metadata: metadata,
+                        text: el.textContent.trim(),
+                        type: 'highlight'
+                    });
+                }
             }
         });
 
@@ -125,6 +157,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (item.type === 'highlight') {
                 html += `  <div class="clip-highlight" ${animDelay}>\n`;
                 html += `    <blockquote><p>${item.text}</p></blockquote>\n`;
+                if (item.note) {
+                    html += `    <div class="clip-note-inline">\n`;
+                    html += `      <p><strong>Note:</strong> ${item.note}</p>\n`;
+                    html += `    </div>\n`;
+                }
                 html += `    <cite>${item.metadata}</cite>\n`;
                 html += `  </div>\n`;
             } else if (item.type === 'note') {
@@ -155,9 +192,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (item.type === 'highlight') {
                 const quotedText = item.text.split('\n').map(line => `> ${line}`).join('\n');
-                md += `${quotedText}\n*${item.metadata}*\n\n`;
+                md += `${quotedText}\n>\n`;
+                if (item.note) {
+                    const quotedNote = item.note.split('\n').map((line, index) => index === 0 ? `> **Note:** ${line}` : `> ${line}`).join('\n');
+                    md += `${quotedNote}\n>\n`;
+                }
+                md += `> *${item.metadata}*\n\n`;
             } else if (item.type === 'note') {
-                md += `**Note:** ${item.text}\n*${item.metadata}*\n\n`;
+                const noteText = item.text.split('\n').map((line, index) => index === 0 ? `**Note:** ${line}` : line).join('\n');
+                md += `${noteText}\n\n*${item.metadata}*\n\n`;
             }
         });
 

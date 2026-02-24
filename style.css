@@ -17,7 +17,7 @@ body {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-primary);
-    background-image: 
+    background-image:
         radial-gradient(circle at 15% 50%, rgba(203, 166, 247, 0.1), transparent 25%),
         radial-gradient(circle at 85% 30%, rgba(137, 180, 250, 0.1), transparent 25%);
     background-attachment: fixed;
@@ -181,7 +181,8 @@ article {
     color: var(--accent);
 }
 
-.clip-highlight, .clip-note {
+.clip-highlight,
+.clip-note {
     margin-bottom: 30px;
     animation: fadeIn 0.5s ease backwards;
 }
@@ -222,6 +223,20 @@ article {
     color: #f9e2af;
 }
 
+.clip-note-inline {
+    margin: 12px 24px 0 24px;
+    padding: 12px 16px;
+    border-left: 3px solid var(--note-border);
+    background: var(--note-bg);
+    border-radius: 0 8px 8px 0;
+}
+
+.clip-note-inline p {
+    margin: 0;
+    color: #f9e2af;
+    font-size: 0.95rem;
+}
+
 cite {
     display: block;
     margin-top: 10px;
@@ -233,12 +248,28 @@ cite {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 600px) {
-    header h1 { font-size: 2.2rem; }
-    .actions { flex-direction: column; }
-    .btn { width: 100%; text-align: center; }
+    header h1 {
+        font-size: 2.2rem;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
 }
